@@ -1,10 +1,10 @@
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import * as FileSaver from 'file-saver';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import * as FileSaver from 'file-saver';
-import { IdentifiedInfo } from './identifiedInfo';
 import { GraphService } from './graph.service';
+import { IdentifiedInfo } from './identifiedInfo';
 
 @Injectable({
   providedIn: 'root'
@@ -141,6 +141,10 @@ export class FilesService {
   }
 
   getRegistries(): Observable<any> {
+
+
+
+    console.log('########### this.getRegistriesURL', this.getRegistriesURL)
     return this.http.get(this.getRegistriesURL);
   }
 

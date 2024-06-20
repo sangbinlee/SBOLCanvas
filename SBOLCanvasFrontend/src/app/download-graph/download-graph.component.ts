@@ -1,14 +1,12 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
-import { LoginService } from '../login.service';
-import { MatDialog, MatDialogRef, MatSort, MatTableDataSource, MAT_DIALOG_DATA } from '@angular/material';
-import { FilesService } from '../files.service';
-import { GraphService } from '../graph.service';
-import { MetadataService } from '../metadata.service';
-import { forkJoin, Subscription } from 'rxjs';
-import { ThrowStmt } from '@angular/compiler';
-import { IdentifiedInfo } from '../identifiedInfo';
-import { FuncCompSelectorComponent } from '../func-comp-selector/func-comp-selector.component';
 import { SelectionModel } from '@angular/cdk/collections';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSort, MatTableDataSource } from '@angular/material';
+import { forkJoin, Subscription } from 'rxjs';
+import { FilesService } from '../files.service';
+import { FuncCompSelectorComponent } from '../func-comp-selector/func-comp-selector.component';
+import { GraphService } from '../graph.service';
+import { LoginService } from '../login.service';
+import { MetadataService } from '../metadata.service';
 
 @Component({
   selector: 'app-download-graph',
@@ -39,14 +37,14 @@ export class DownloadGraphComponent implements OnInit {
   classRef = DownloadGraphComponent;
 
   registries: string[];
-  registry: string;
   partTypes: string[];
   history: any[];
   partRoles: string[];
   roleRefinements: string[];
 
-  collection: string;
+  registry: string;
   partType: string;
+  collection: string;
   partRole: string;
   partRefine: string;
 
@@ -63,8 +61,15 @@ export class DownloadGraphComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialog: MatDialog, private metadataService: MetadataService, private graphService: GraphService, private filesService: FilesService, private loginService: LoginService, public dialogRef: MatDialogRef<DownloadGraphComponent>) { }
 
   ngOnInit() {
+
+
+    console.log('####################### [ngOnInit]')
     this.working = true;
-    if (this.data != null) {
+
+
+
+    if (this.data != null) {// data exist
+      console.log('####################### [ngOnInit] this.data', this.data)
       if (this.data.mode != null) {
         this.mode = this.data.mode;
         if(this.mode == DownloadGraphComponent.SELECT_MODE){
@@ -73,12 +78,22 @@ export class DownloadGraphComponent implements OnInit {
       } else {
         this.mode = DownloadGraphComponent.DOWNLOAD_MODE;
       }
+
+
+      console.log('####################### [ngOnInit] this.mode', this.mode)
+
       if (this.data.type != null) {
         this.type = this.data.type;
       } else {
         this.type = DownloadGraphComponent.MODULE_AND_COMPONENT_TYPE;
       }
+
+      
+      console.log('####################### [ngOnInit] this.type', this.type)
+      console.log('####################### [ngOnInit] this.data.info', this.data.info)
       if (this.data.info != null) {
+
+
         this.partType = this.data.info.partType;
         this.partRole = this.data.info.partRole ? this.data.info.partRole : "";
         this.partRefine = this.data.info.partRefine;
@@ -102,12 +117,18 @@ export class DownloadGraphComponent implements OnInit {
         });
       }
     } else {
+
+
       this.mode = DownloadGraphComponent.DOWNLOAD_MODE;
       this.filesService.getRegistries().subscribe(registries => {
         this.registries = registries;
         this.working = false;
       });
     }
+
+
+
+
     this.updateParts();
     this.parts.sort = this.sort;
     this.history = [];
@@ -124,21 +145,37 @@ export class DownloadGraphComponent implements OnInit {
 
   applyFilter(filterValue: string) {
     this.parts.filter = filterValue.trim().toLowerCase();
+    console.log('♥ this.parts.filter(filter)....................',this.parts.filter)
+    localStorage.setItem('6partFilter',this.parts.filter)  
+    console.log('♥ .localStorage.getItem(\'partFilter\')',localStorage.getItem('6partFilter'))  
   }
 
+  // start anaylize code
   setRegistry(registry: string) {
+    localStorage.clear()
     this.registry = registry;
+    console.log('♥ this.registry(Server)....................',this.registry)
+    localStorage.setItem('1registry',this.registry)
+    console.log('♥ .localStorage.getItem(\'registry\')',localStorage.getItem('1registry'))  
     this.updateParts();
   }
 
   setPartType(partType: string) {
     this.partType = partType;
+    console.log('♥ this.partType(Part type)....................',this.partType)
+    localStorage.setItem('2partType',this.partType)
+    console.log('♥ .localStorage.getItem(\'partType\')',localStorage.getItem('2partType'))  
     this.updateParts();
   }
 
   setPartRole(partRole: string) {
     this.partRole = partRole;
-    this.partRefine = null;
+    console.log('♥ this.partRole(Part role)....................',this.partRole)
+    localStorage.setItem('4partRole',this.partRole)
+    console.log('♥ .localStorage.getItem(\'partRole\')',localStorage.getItem('4partRole'))  
+    // this.partRefine = null;
+    // localStorage.setItem('5partRefine',this.partRefine)
+    // console.log('♥ .localStorage.getItem(\'partRefine\')',localStorage.getItem('5partRefine'))  
     if (this.partRole != null && this.partRole.length > 0)
       this.updateRefinements();
     this.updateParts();
@@ -146,6 +183,9 @@ export class DownloadGraphComponent implements OnInit {
 
   setPartRefinement(partRefine: string) {
     this.partRefine = partRefine;
+    console.log('♥ this.partRefine(Role refinement)....................',this.partRefine)
+    localStorage.setItem('5partRefine',this.partRefine)
+    console.log('♥ .localStorage.getItem(\'partRefine\')',localStorage.getItem('5partRefine'))  
     this.updateParts();
   }
 
@@ -165,7 +205,27 @@ export class DownloadGraphComponent implements OnInit {
   }
 
   onCancelClick() {
+    // when dialog is closed, save form data with localstorage
+    console.log('♥onCancelClick')
+    this.saveFormDataWithLocalStorage()
+
     this.dialogRef.close();
+  }
+
+  saveFormDataWithLocalStorage(){ 
+ 
+
+    // console.log('♥ ........server(registry)',this.registry)
+    // console.log('♥ ........part Type',this.partType)
+    // console.log('♥ ........collection',this.collection)
+    // console.log('♥ ........part Role',this.partRole)
+    // console.log('♥ ........role Refinement',this.partRefine)
+    // console.log('♥ ........filter',this.parts.filter)
+
+
+  
+
+    // this.updateParts();
   }
 
   onEnterCollectionClick(){
@@ -308,18 +368,66 @@ export class DownloadGraphComponent implements OnInit {
       this.history.length = 0;
     this.collection = collection;
 
+    console.log('♥ this.collection(Collection)....................',this.collection)
+    localStorage.setItem('3collection',this.collection)
+    console.log('♥ .localStorage.getItem(\'collection\')',localStorage.getItem('3collection'))  
     this.updateParts();
   }
 
+
+
+  getMyHistory() {
+
+    console.log('♥ .localStorage.getItem(\'registry\')',localStorage.getItem('1registry'))  
+    console.log('♥ .localStorage.getItem(\'partType\')',localStorage.getItem('2partType'))  
+    console.log('♥ .localStorage.getItem(\'collection\')',localStorage.getItem('3collection'))  
+    console.log('♥ .localStorage.getItem(\'partRole\')',localStorage.getItem('4partRole'))  
+    console.log('♥ .localStorage.getItem(\'partRefine\')',localStorage.getItem('5partRefine'))  
+    console.log('♥ .localStorage.getItem(\'partFilter\')',localStorage.getItem('6partFilter'))  
+
+
+    if(localStorage.getItem('1registry') != null && localStorage.getItem('1registry').length > 0)
+    this.registry = localStorage.getItem('1registry')
+    if(localStorage.getItem('2partType') != null && localStorage.getItem('2partType').length > 0)
+    this.partType = localStorage.getItem('2partType')
+    if(localStorage.getItem('3collection') != null && localStorage.getItem('3collection').length > 0)
+    this.collection = localStorage.getItem('3collection')
+    if(localStorage.getItem('4partRole') != null && localStorage.getItem('4partRole').length > 0)
+    this.partRole = localStorage.getItem('4partRole')
+    if(localStorage.getItem('5partRefine') != null && localStorage.getItem('5partRefine').length > 0)
+    this.partRefine = localStorage.getItem('5partRefine')
+    if(localStorage.getItem('6partFilter') != null && localStorage.getItem('6partFilter').length > 0)
+    this.parts.filter = localStorage.getItem('6partFilter')
+    
+    console.log('♥ ........server(registry)',this.registry)
+    console.log('♥ ........part Type',this.partType)
+    console.log('♥ ........collection',this.collection)
+    console.log('♥ ........part Role',this.partRole)
+    console.log('♥ ........role Refinement',this.partRefine)
+    console.log('♥ ........filter',this.parts.filter)
+  }
+
   updateParts() {
+    console.log('########################### updateParts')
+
+    this.getMyHistory()
+
+    console.log('♥ ....................this.parts.data',this.parts.data)
+    console.log('♥ ....................this.type',this.type)
+
     if (this.partRequest && !this.partRequest.closed) {
+      console.log('♥ this way....................this.partRequest',this.partRequest)
       this.partRequest.unsubscribe();
     }
 
     if (this.registry != null) {
+      console.log('♥ 1....................this.registry',this.registry)
+      console.log('♥ 1....................this.type',this.type)
+      console.log('♥ 1....................DownloadGraphComponent.COMPONENT_TYPE',DownloadGraphComponent.COMPONENT_TYPE)
       this.working = true;
       this.parts.data = [];
       if (this.type == DownloadGraphComponent.COMPONENT_TYPE) {
+        console.log('♥ this type....................this.COMPONENT_TYPE',this.type)
         // collection and components
         let roleOrRefine = this.partRefine != null && this.partRefine.length > 0 ? this.partRefine : this.partRole;
         this.partRequest = forkJoin(
@@ -339,6 +447,7 @@ export class DownloadGraphComponent implements OnInit {
           this.working = false;
         })
       } else if(this.type == DownloadGraphComponent.MODULE_TYPE){
+        console.log('♥ this type....................this.MODULE_TYPE',this.type)
         // collections and modules
         this.partRequest = forkJoin(
           this.filesService.listParts(this.loginService.users[this.registry], this.registry, this.collection, null, null, "collections"),
@@ -357,6 +466,7 @@ export class DownloadGraphComponent implements OnInit {
           this.working = false;
         });
       }else{
+        console.log('♥ this type....................this.other',this.type)
         // collection, modules, and components
         this.partRequest = forkJoin(
           this.filesService.listParts(this.loginService.users[this.registry], this.registry, this.collection, null, null, "collections"),
@@ -381,6 +491,7 @@ export class DownloadGraphComponent implements OnInit {
         });
       }
     } else {
+      console.log('♥ this way....................this.registry',this.registry)
       this.parts.data = [];
     }
   }

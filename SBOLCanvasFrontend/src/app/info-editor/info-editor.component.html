@@ -63,7 +63,7 @@
     <textarea matInput id="sequence" placeholder="Sequence" value="{{glyphInfo.sequence}}" (change)="inputChange($event)" matTooltipShowDelay="1000" matTooltip="Represents the constituents of a biological or chemical molecule."></textarea>
   </mat-form-field>
 
-  <button mat-stroked-button (click)="openDownloadDialog()">Import Component</button>
+  <button mat-stroked-button (click)="openDownloadDialog()">Import Component2</button>
   <button *ngIf="isCombinatorialPossible()" mat-stroked-button (click)="openCombinatorialDialog()">Edit Combinatorial Design</button>
 </div>
 
@@ -88,7 +88,7 @@
   <mat-label *ngIf="synBioHubDesign()" matTooltipShowDelay="1000" matTooltip="{{ moduleInfo.getFullURI() }}">URI: <a href="{{ moduleInfo.getFullURI() }}" target="_blank">SynBioHub Record</a></mat-label>
   <mat-label *ngIf="importedDesign()" matTooltipShowDelay="1000" matTooltip="{{ moduleInfo.getFullURI() }}">URI: Imported Design</mat-label>
 
-  <button mat-stroked-button (click)="openDownloadDialog(true)">Import Component</button>
+  <button mat-stroked-button (click)="openDownloadDialog(true)">Import Component3</button>
 </div>
 
 
